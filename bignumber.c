@@ -100,6 +100,9 @@ void printBigNumber(BigNumber* number) {
     while(atual !=NULL && atual->valor == 0){
         atual = atual->prox;
     }
+    if(atual == NULL){
+        printf("0");
+    }
 
     while(atual != NULL){
         printf("%d", atual->valor);
@@ -111,7 +114,7 @@ void printBigNumber(BigNumber* number) {
 
 
 BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b){
-    printf("\nrodou soma\n");
+
     BigNumber* total = criar_BigNumber();
     
     Node* casa_a = a->tail; //começa pela casa das unidades
@@ -141,7 +144,7 @@ BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b){
 }
 
 BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
-    printf("\nrodou subtracao\n");
+
     BigNumber* total = criar_BigNumber();
 
     char maior = maiorBigNumber(a, b);

@@ -1,16 +1,34 @@
 #include "bignumber.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
 
-    BigNumber* a = string_para_BigNumber("-2130813");
-    BigNumber* b = string_para_BigNumber("+123");
+    char* x = NULL;
+    size_t tamanhoX = 0;
+    getline(&x, &tamanhoX, stdin);
+    if (x[strlen(x) - 1] == '\n') {
+        x[strlen(x) - 1] = '\0';
+    }
 
-    char sinal = '-';
+    char* y = NULL;
+    size_t tamanhoY = 0;
+    getline(&y, &tamanhoY, stdin);
+    if (y[strlen(y) - 1] == '\n') {
+        y[strlen(y) - 1] = '\0';
+    }
+
+    BigNumber* a = string_para_BigNumber(x);
+    BigNumber* b = string_para_BigNumber(y);
+
+    free(x);
+    free(y);
+
+    char sinal;
+    scanf("%c", &sinal);
 
     BigNumber* resultado = operacao(a, b, sinal);
 
-    printf("Resultado da operacao: ");
     printBigNumber(resultado);
 
     libera_BigNumber(a);
