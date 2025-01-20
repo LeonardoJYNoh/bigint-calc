@@ -14,6 +14,20 @@ BigNumber* criar_BigNumber() {
     //cria um BigNumber vazio
 }
 
+void remove_zero(BigNumber* a){
+    if((a->head->ant == NULL && a->head->prox == NULL && a->head->valor == 0) || a->head->valor != 0){
+        return;
+    }else if(a->head->valor == 0){
+        while(a->head->valor == 0){
+            a->head = a->head->prox;
+            a->head->ant = NULL;
+            a->tamanho--;
+        }
+    }else{
+        printf("deu erro aqui");
+    }
+}
+
 void adiciona_no_final(BigNumber* number, int valor){
     //criação de um novo nó
 
@@ -49,6 +63,13 @@ void adiciona_no_inicio(BigNumber* number, int valor) {
 
     number->head = novo_node; // atualiza o head para o novo nó
     number->tamanho++;
+}
+
+BigNumber* incrementa_bignumber(BigNumber* a){
+    BigNumber* incremento = criar_BigNumber();
+    adiciona_no_final(incremento, 1);
+
+    return soma_BigNumber(a, incremento);
 }
 
 BigNumber* string_para_BigNumber(const char* string) {
@@ -97,13 +118,6 @@ void printBigNumber(BigNumber* number) {
 
     Node* atual = number->head;
 
-    while(atual !=NULL && atual->valor == 0){
-        atual = atual->prox;
-    }
-    if(atual == NULL){
-        printf("0");
-    }
-
     while(atual != NULL){
         printf("%d", atual->valor);
         atual = atual->prox;
@@ -139,6 +153,8 @@ BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b){
     }
 
     alteraSinalSoma(a, total);
+
+    remove_zero(total);
 
     return total;
 }
@@ -207,7 +223,30 @@ BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
     
     alteraSinalSubtracao(a, b, total);
 
+    remove_zero(total);
+
     return total;
+}
+
+BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
+
+    BigNumber* quociente = criar_BigNumber();
+
+    if(maiorBigNumber(a,b) == 'b'){
+        adiciona_no_final(quociente, 0);
+        return quociente;
+    }
+
+    while(maiorBigNumber(a, b) == 'a' || maiorBigNumber(a, b) == 'c'){
+        a = subtrai_BigNumber(a, b);
+        quociente = incrementa_bignumber(quociente);
+    }
+
+    alteraSinalDivisao(a, b, quociente);
+
+    remove_zero(quociente);
+
+    return quociente;
 }
 
 //altera sinal se necessario
@@ -224,6 +263,12 @@ void alteraSinalSubtracao(BigNumber* a, BigNumber* b, BigNumber* total){
         total->eh_negativo = 1;
     }else if(maior == 'b' && (a->eh_negativo == 0)){
         total->eh_negativo = 1;
+    }
+}
+
+void alteraSinalDivisao(BigNumber* a, BigNumber*b, BigNumber* quociente){
+    if(a->eh_negativo != b->eh_negativo){
+        quociente->eh_negativo = 1;
     }
 }
 
@@ -268,6 +313,8 @@ BigNumber* operacao(BigNumber* a, BigNumber* b, char sinal){
         return soma_BigNumber(a, b);
     }else if((sinal == '+' && (a->eh_negativo != b->eh_negativo)) || (sinal == '-' && (a->eh_negativo == b->eh_negativo))){
         return subtrai_BigNumber(a, b);
+    }else if(sinal == '/'){
+        return divide_BigNumber(a,b);
     }else{
         return NULL;
     }

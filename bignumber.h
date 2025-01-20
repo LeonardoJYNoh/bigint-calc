@@ -25,11 +25,13 @@ typedef struct BigNumber {
 
 BigNumber* criar_BigNumber();
 void adiciona(BigNumber* number, int valor);
+BigNumber* incrementa_bignumber(BigNumber* a);
 BigNumber* string_para_BigNumber(const char* string);
 void libera_BigNumber(BigNumber* number);
 void printBigNumber(BigNumber* number);
 BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b);
 BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b);
+BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b);
 
 //funções
 
@@ -39,5 +41,7 @@ char maiorInt(int a, int b);
 BigNumber* operacao(BigNumber* a, BigNumber* b, char sinal);
 void alteraSinalSoma(BigNumber* a, BigNumber* total);
 void alteraSinalSubtracao(BigNumber* a, BigNumber* b, BigNumber* total);
+void alteraSinalDivisao(BigNumber* a, BigNumber* b, BigNumber* quociente);
+void remove_zero(BigNumber* a);
 
 #endif //BIGNUMBER_H
