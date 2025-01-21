@@ -228,6 +228,40 @@ BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
     return total;
 }
 
+BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b){
+	
+	BigNumber* total = criar_BigNumber();
+	
+	Node* casa_b = b->tail;
+	int valor_decimal = 0;
+
+	while(casa_b != NULL){
+        BigNumber* soma_parcial = criar_BigNumber();
+		int valor_atual = casa_b->valor;
+		
+		for(int i = 0; i < valor_atual; i++){
+			BigNumber* soma = soma_BigNumber(soma_parcial, a);
+            libera_BigNumber(soma_parcial);
+			soma_parcial = soma;
+		}
+		
+        for(int i = 0; i < valor_decimal; i++)
+            adiciona_no_final(soma_parcial, 0);
+
+		BigNumber* parcial = soma_BigNumber(total, soma_parcial);
+        libera_BigNumber(total);
+		total = parcial;
+		
+        libera_BigNumber(soma_parcial);
+		casa_b = casa_b->ant;
+        valor_decimal++;
+	}
+    
+    alteraSinalDivisaoMultiplicacao(a, b, total);
+    
+    return total;
+}
+
 BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
 
     BigNumber* quociente = criar_BigNumber();
@@ -242,7 +276,7 @@ BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
         quociente = incrementa_bignumber(quociente);
     }
 
-    alteraSinalDivisao(a, b, quociente);
+    alteraSinalDivisaoMultiplicacao(a, b, quociente);
 
     remove_zero(quociente);
 
@@ -266,9 +300,9 @@ void alteraSinalSubtracao(BigNumber* a, BigNumber* b, BigNumber* total){
     }
 }
 
-void alteraSinalDivisao(BigNumber* a, BigNumber*b, BigNumber* quociente){
+void alteraSinalDivisaoMultiplicacao(BigNumber* a, BigNumber*b, BigNumber* total){
     if(a->eh_negativo != b->eh_negativo){
-        quociente->eh_negativo = 1;
+        total->eh_negativo = 1;
     }
 }
 
@@ -314,7 +348,9 @@ BigNumber* operacao(BigNumber* a, BigNumber* b, char sinal){
     }else if((sinal == '+' && (a->eh_negativo != b->eh_negativo)) || (sinal == '-' && (a->eh_negativo == b->eh_negativo))){
         return subtrai_BigNumber(a, b);
     }else if(sinal == '/'){
-        return divide_BigNumber(a,b);
+        return divide_BigNumber(a, b);
+    }else if(sinal == '*'){
+        return multiplica_BigNumber(a, b);
     }else{
         return NULL;
     }
