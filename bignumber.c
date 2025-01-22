@@ -93,6 +93,8 @@ BigNumber* string_para_BigNumber(const char* string) {
         }
     }
 
+    remove_zero(number);
+
     return number;
 }
 
@@ -269,12 +271,19 @@ BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
     if(maiorBigNumber(a,b) == 'b'){
         adiciona_no_final(quociente, 0);
         return quociente;
+    }else if(b->head->valor == 0){
+        adiciona_no_final(quociente, 0);
+        return quociente;
     }
+
+    int temp = a->eh_negativo;
 
     while(maiorBigNumber(a, b) == 'a' || maiorBigNumber(a, b) == 'c'){
         a = subtrai_BigNumber(a, b);
         quociente = incrementa_bignumber(quociente);
     }
+
+    a->eh_negativo = temp;
 
     alteraSinalDivisaoMultiplicacao(a, b, quociente);
 
@@ -305,8 +314,6 @@ void alteraSinalDivisaoMultiplicacao(BigNumber* a, BigNumber*b, BigNumber* total
         total->eh_negativo = 1;
     }
 }
-
-//olha se ainda existem valores nao nulos a esquerda
 
 //retorna o int maior
 char maiorInt(int a, int b){
