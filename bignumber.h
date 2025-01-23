@@ -33,6 +33,7 @@ BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b);
 BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b);
 BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b);
 BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b);
+BigNumber* resto_BigNumber(BigNumber* a, BigNumber* b);
 
 //funções
 
