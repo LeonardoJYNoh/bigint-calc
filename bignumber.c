@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//cria BigNumber vazio
 BigNumber* criar_BigNumber() {
     BigNumber* number = malloc(sizeof(BigNumber));
     number->head = number->tail = NULL;
@@ -10,10 +11,24 @@ BigNumber* criar_BigNumber() {
     number->identificacao = 0;
 
     return number;
-
-    //cria um BigNumber vazio
 }
 
+//libera memória para um BigNumber 
+void libera_BigNumber(BigNumber* number) {
+    Node* atual = number->head;
+    int count = number->tamanho;
+
+    while (count > 0) { 
+        Node* prox = atual->prox; 
+        free(atual);              
+        atual = prox;             
+        count--;                  
+    }
+
+    free(number); 
+}
+
+//remove possíveis zeros à esquerda do BigNumber, para representá-lo de maneira correta
 void remove_zero(BigNumber* a){
     if((a->head->ant == NULL && a->head->prox == NULL && a->head->valor == 0) || a->head->valor != 0){
         return;
@@ -28,64 +43,111 @@ void remove_zero(BigNumber* a){
     }
 }
 
+//acrescenta valores no final da "lista"
 void adiciona_no_final(BigNumber* number, int valor){
-    //criação de um novo nó
-
     Node* novo_node = malloc(sizeof(Node));
-    novo_node->valor = valor; //agrega um valor ao nó
-    novo_node->prox = NULL;   //proximo valor dele será nulo
-    novo_node->ant = number->tail; //o anterior será o nó que atualmente é o tail
+    novo_node->valor = valor; 
+    novo_node->prox = NULL;   
+    novo_node->ant = number->tail; 
 
     if (number->tail) {
-        number->tail->prox = novo_node; // o antigo tail aponta para o novo nó, caso a lista não estaja vazia(number->tail não é NULL)
+        number->tail->prox = novo_node; 
     } else {
-        number->head = novo_node; // se a lista estava vazia, o head também é o novo nó
+        number->head = novo_node; 
     }
 
-    number->tail = novo_node;  // atualiza o tail para o novo nó
-    number->tamanho++;           // incrementa o valor do tamanho
-
-//acrescenta valores no final da "lista".
-
+    number->tail = novo_node;  
+    number->tamanho++;           
 }
 
+//acrescenta valores no início da "lista"
 void adiciona_no_inicio(BigNumber* number, int valor) {
     Node* novo_node = malloc(sizeof(Node));
     novo_node->valor = valor;
-    novo_node->prox = number->head; // o próximo nó é o atual head
-    novo_node->ant = NULL;          // não há anterior para o novo head
+    novo_node->prox = number->head; 
+    novo_node->ant = NULL;          
 
     if (number->head) {
-        number->head->ant = novo_node; // atualiza o anterior do antigo head
+        number->head->ant = novo_node; 
     } else {
-        number->tail = novo_node; // se a lista estava vazia, tail também aponta para o novo nó
+        number->tail = novo_node; 
     }
 
-    number->head = novo_node; // atualiza o head para o novo nó
+    number->head = novo_node; 
     number->tamanho++;
 }
 
-BigNumber* incrementa_bignumber(BigNumber* a){
-    BigNumber* incremento = criar_BigNumber();
-    adiciona_no_final(incremento, 1);
-
-    return soma_BigNumber(a, incremento);
+//retorna o maior int
+char maiorInt(int a, int b){
+    if(b > a){
+        return 'b';
+    }else{
+        return 'a';
+    }
 }
 
+//retorna o maior BigNumber em módulo
+char maiorBigNumber(BigNumber* a, BigNumber* b){
+    if(a->tamanho != b->tamanho){
+        return maiorInt(a->tamanho, b->tamanho);
+    }
+    else{
+        Node* casa_a = a->head;
+        Node* casa_b = b->head;
+
+        while(casa_a != NULL && casa_b != NULL){
+            if(casa_a->valor != casa_b->valor){
+                return maiorInt(casa_a->valor, casa_b->valor);
+            }
+
+            casa_a = casa_a->prox;
+            casa_b = casa_b->prox;            
+        }
+
+        return 'c';     
+    }
+}
+
+//altera sinal se necessario
+void alteraSinalSoma(BigNumber* a, BigNumber* total){
+    if(a->eh_negativo == 1){
+        total->eh_negativo = 1;
+    }
+}
+
+//determina o sinal da subtração
+void alteraSinalSubtracao(BigNumber* a, BigNumber* b, BigNumber* total){
+    char maior = maiorBigNumber(a, b);
+
+    if(maior == 'a' && (a->eh_negativo == 1)){
+        total->eh_negativo = 1;
+    }else if(maior == 'b' && (a->eh_negativo == 0)){
+        total->eh_negativo = 1;
+    }
+}
+
+//determina o sinal da divisão e multiplicação
+void alteraSinalDivisaoMultiplicacao(BigNumber* a, BigNumber*b, BigNumber* total){
+    if(a->eh_negativo != b->eh_negativo){
+        total->eh_negativo = 1;
+    }
+}
+
+//converte a string obtida nos inputs em BigNumbers
 BigNumber* string_para_BigNumber(const char* string) {
     BigNumber* number = criar_BigNumber(); 
 
-    int start = 0; // Índice inicial
+    int start = 0; 
     if (string[0] == '-') {
         number->eh_negativo = 1;
-        start = 1; // Começa após o sinal
+        start = 1; 
     } else if (string[0] == '+') {
-        start = 1; // Ignora o sinal '+'
+        start = 1; 
     }
 
     for (int i = start; string[i] != '\0'; i++) {
         if (string[i] >= '0' && string[i] <= '9') {
-            adiciona_no_final(number, string[i] - '0'); // Converte caractere para inteiro
+            adiciona_no_final(number, string[i] - '0'); 
         } else {
             printf("Erro no caracter '%c'\n", string[i]);
             libera_BigNumber(number);
@@ -98,24 +160,11 @@ BigNumber* string_para_BigNumber(const char* string) {
     return number;
 }
 
-void libera_BigNumber(BigNumber* number) {
-    Node* atual = number->head;
-    int count = number->tamanho;
-
-    while (count > 0) { // Usa o tamanho como critério
-        Node* prox = atual->prox; // Salva o próximo nó
-        free(atual);              // Libera o nó atual
-        atual = prox;             // Avança para o próximo nó
-        count--;                  // Decrementa o contador
-    }
-
-    free(number); // Libera a estrutura principal do BigNumber
-}
-
+//imprime o BigNumber obtido como resultado
 void printBigNumber(BigNumber* number) {
     
     if (number->eh_negativo){
-        printf("-"); // Imprime o sinal, se necessário
+        printf("-"); // Imprime o sinal nos casos necessários
     }
 
     Node* atual = number->head;
@@ -128,17 +177,17 @@ void printBigNumber(BigNumber* number) {
     printf("\n");
 }
 
-
+//função para somar BigNumbers
 BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b){
 
     BigNumber* total = criar_BigNumber();
     
-    Node* casa_a = a->tail; //começa pela casa das unidades
-    Node* casa_b = b->tail; //começa pela casa das unidades
-    int retencao = 0; //numero para a proxima casa
+    Node* casa_a = a->tail; 
+    Node* casa_b = b->tail; 
+    int retencao = 0; 
 
     while (casa_a != NULL || casa_b != NULL || retencao){
-        int soma = retencao; //começa com 0 nas unidades, e se a soma der >= 10 a soma começara com um valor diferente de 0
+        int soma = retencao; 
 
         if (casa_a != NULL){
             soma += casa_a->valor;
@@ -161,6 +210,7 @@ BigNumber* soma_BigNumber(BigNumber* a, BigNumber* b){
     return total;
 }
 
+//função para subtrair BigNumbers
 BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
 
     BigNumber* total = criar_BigNumber();
@@ -171,13 +221,13 @@ BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
     Node* casa_menor;
 
     if(maior == 'a'){
-        casa_maior = a->tail; //começa pela casa das unidades
-        casa_menor = b->tail; //começa pela casa das unidades
+        casa_maior = a->tail; 
+        casa_menor = b->tail; 
     }else if(maior == 'b'){
-        casa_maior = b->tail; //começa pela casa das unidades
-        casa_menor = a->tail; //começa pela casa das unidades
+        casa_maior = b->tail; 
+        casa_menor = a->tail; 
     }else{
-        adiciona_no_final(total, 0); //simplesmente retorna 0 pois ambos bignumbers sao iguais
+        adiciona_no_final(total, 0); 
         return total;
     }
 
@@ -230,11 +280,12 @@ BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
     return total;
 }
 
+//função para multiplicar BigNumbers
 BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b) {
     BigNumber* total = criar_BigNumber();
 
     Node* casa_b = b->tail;
-    int valor_decimal = 0;
+    int valor_decimal = 0;  
 
     while (casa_b != NULL) {
         if (casa_b->valor != 0) { 
@@ -246,9 +297,9 @@ BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b) {
                 libera_BigNumber(soma_parcial); 
                 soma_parcial = soma; 
             }
-
+	    
             for (int i = 0; i < valor_decimal; i++) {
-                adiciona_no_final(soma_parcial, 0);
+                adiciona_no_final(soma_parcial, 0); 
             }
 
             BigNumber* parcial = soma_BigNumber(total, soma_parcial);
@@ -267,6 +318,7 @@ BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b) {
     return total;
 }
 
+//função para dividir BigNumbers
 BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
 
     BigNumber* quociente = criar_BigNumber();
@@ -295,6 +347,7 @@ BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
     return quociente;
 }
 
+//função extra para obter o resto das divisões entre BigNumbers
 BigNumber* resto_BigNumber(BigNumber* a, BigNumber* b) {
     
     if (b->head->valor == 0) {
@@ -325,63 +378,15 @@ BigNumber* resto_BigNumber(BigNumber* a, BigNumber* b) {
     return resto;
 }
 
-//altera sinal se necessario
-void alteraSinalSoma(BigNumber* a, BigNumber* total){
-    if(a->eh_negativo == 1){
-        total->eh_negativo = 1;
-    }
+//função usada para obter o quociente na divisão
+BigNumber* incrementa_bignumber(BigNumber* a){
+    BigNumber* incremento = criar_BigNumber();
+    adiciona_no_final(incremento, 1);
+
+    return soma_BigNumber(a, incremento);
 }
 
-void alteraSinalSubtracao(BigNumber* a, BigNumber* b, BigNumber* total){
-    char maior = maiorBigNumber(a, b);
-
-    if(maior == 'a' && (a->eh_negativo == 1)){
-        total->eh_negativo = 1;
-    }else if(maior == 'b' && (a->eh_negativo == 0)){
-        total->eh_negativo = 1;
-    }
-}
-
-void alteraSinalDivisaoMultiplicacao(BigNumber* a, BigNumber*b, BigNumber* total){
-    if(a->eh_negativo != b->eh_negativo){
-        total->eh_negativo = 1;
-    }
-}
-
-//retorna o int maior
-char maiorInt(int a, int b){
-    if(b > a){
-        return 'b';
-    }else{
-        return 'a';
-    }
-}
-
-//retorna a se o maior for o primeiro numero e retorna b se o maior for o segundo
-//em modulo
-char maiorBigNumber(BigNumber* a, BigNumber* b){
-
-    if(a->tamanho != b->tamanho){
-        return maiorInt(a->tamanho, b->tamanho);
-    }
-    else{
-        Node* casa_a = a->head;
-        Node* casa_b = b->head;
-
-        while(casa_a != NULL && casa_b != NULL){
-            if(casa_a->valor != casa_b->valor){
-                return maiorInt(casa_a->valor, casa_b->valor);
-            }
-
-            casa_a = casa_a->prox;
-            casa_b = casa_b->prox;            
-        }
-
-        return 'c';     
-    }
-}
-
-//chama operacao soma ou subtracao dependendo dos sinais
+//chama a operação a ser executada dependendo do input fornecido
 BigNumber* operacao(BigNumber* a, BigNumber* b, char sinal){
     if((sinal == '+' && (a->eh_negativo == b->eh_negativo)) || (sinal == '-' && (a->eh_negativo != b->eh_negativo))){
         return soma_BigNumber(a, b);
