@@ -292,6 +292,36 @@ BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
     return quociente;
 }
 
+BigNumber* resto_BigNumber(BigNumber* a, BigNumber* b) {
+    
+    if (b->head->valor == 0) {
+        return NULL;
+    }
+    
+    BigNumber* resto = criar_BigNumber();
+    Node* casa_a = a->head;
+    while (casa_a != NULL) {
+        adiciona_no_final(resto, casa_a->valor);
+        casa_a = casa_a->prox;
+    }
+    
+    if (maiorBigNumber(a, b) == 'b') {
+        return resto;
+    }
+
+    while (maiorBigNumber(resto, b) == 'a' || maiorBigNumber(resto, b) == 'c') {
+        BigNumber* subtracao = subtrai_BigNumber(resto, b);
+        libera_BigNumber(resto);
+        resto = subtracao;
+    }
+
+    resto->eh_negativo = a->eh_negativo;
+
+    remove_zero(resto);
+
+    return resto;
+}
+
 //altera sinal se necessario
 void alteraSinalSoma(BigNumber* a, BigNumber* total){
     if(a->eh_negativo == 1){
@@ -358,7 +388,9 @@ BigNumber* operacao(BigNumber* a, BigNumber* b, char sinal){
         return divide_BigNumber(a, b);
     }else if(sinal == '*'){
         return multiplica_BigNumber(a, b);
+    }else if(sinal == '%'){
+        return resto_BigNumber(a, b);
     }else{
-        return NULL;
+	return NULL;
     }
 }
