@@ -230,37 +230,40 @@ BigNumber* subtrai_BigNumber(BigNumber* a, BigNumber* b){
     return total;
 }
 
-BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b){
-	
-	BigNumber* total = criar_BigNumber();
-	
-	Node* casa_b = b->tail;
-	int valor_decimal = 0;
+BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b) {
+    BigNumber* total = criar_BigNumber();
 
-	while(casa_b != NULL){
-        BigNumber* soma_parcial = criar_BigNumber();
-		int valor_atual = casa_b->valor;
-		
-		for(int i = 0; i < valor_atual; i++){
-			BigNumber* soma = soma_BigNumber(soma_parcial, a);
+    Node* casa_b = b->tail;
+    int valor_decimal = 0;
+
+    while (casa_b != NULL) {
+        if (casa_b->valor != 0) { 
+            BigNumber* soma_parcial = criar_BigNumber(); 
+            int valor_atual = casa_b->valor;
+
+            for (int i = 0; i < valor_atual; i++) {
+                BigNumber* soma = soma_BigNumber(soma_parcial, a); 
+                libera_BigNumber(soma_parcial); 
+                soma_parcial = soma; 
+            }
+
+            for (int i = 0; i < valor_decimal; i++) {
+                adiciona_no_final(soma_parcial, 0);
+            }
+
+            BigNumber* parcial = soma_BigNumber(total, soma_parcial);
+            libera_BigNumber(total);
+            total = parcial;
+
             libera_BigNumber(soma_parcial);
-			soma_parcial = soma;
-		}
-		
-        for(int i = 0; i < valor_decimal; i++)
-            adiciona_no_final(soma_parcial, 0);
-
-		BigNumber* parcial = soma_BigNumber(total, soma_parcial);
-        libera_BigNumber(total);
-		total = parcial;
-		
-        libera_BigNumber(soma_parcial);
-		casa_b = casa_b->ant;
+        }
+        casa_b = casa_b->ant;
         valor_decimal++;
-	}
-    
+    }
+
     alteraSinalDivisaoMultiplicacao(a, b, total);
-    
+    remove_zero(total);
+
     return total;
 }
 
