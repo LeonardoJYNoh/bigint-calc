@@ -1,6 +1,7 @@
 #include "bignumber.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 //cria BigNumber vazio
 BigNumber* criar_BigNumber() {
@@ -26,6 +27,18 @@ void libera_BigNumber(BigNumber* number) {
     }
 
     free(number); 
+}
+
+//multiplica bignumber por inteiro
+BigNumber* multiplica_BigNumber_inteiro(BigNumber* a, int b){
+    char *str = (char*) malloc(20 * sizeof(char));
+    sprintf(str, "%d", b);
+
+    BigNumber* temp = multiplica_BigNumber(a, string_para_BigNumber(str));
+
+    free(str);
+
+    return temp;
 }
 
 //remove possíveis zeros à esquerda do BigNumber, para representá-lo de maneira correta
@@ -322,7 +335,7 @@ BigNumber* multiplica_BigNumber(BigNumber* a, BigNumber* b) {
 BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
 
     BigNumber* quociente = criar_BigNumber();
-
+    
     if(maiorBigNumber(a,b) == 'b'){
         adiciona_no_final(quociente, 0);
         return quociente;
@@ -331,7 +344,27 @@ BigNumber* divide_BigNumber(BigNumber* a, BigNumber* b){
         return quociente;
     }
 
+    adiciona_no_final(quociente, 1);
+
     int temp = a->eh_negativo;
+
+    int i = 1;
+    int j = 1;
+
+    while(maiorBigNumber(a, multiplica_BigNumber_inteiro(b, i)) == 'a' || maiorBigNumber(a, multiplica_BigNumber_inteiro(b, i)) == 'c'){
+        i*=10;
+    }
+
+    i=i/10;
+
+    while(maiorBigNumber(a, multiplica_BigNumber_inteiro(b, i * j)) == 'a' || maiorBigNumber(a, multiplica_BigNumber_inteiro(b, i * j)) == 'c'){
+        j++;
+    }
+
+    j--;
+
+    a = subtrai_BigNumber(a, multiplica_BigNumber_inteiro(b, i * j));
+    quociente = multiplica_BigNumber_inteiro(quociente, i * j);
 
     while(maiorBigNumber(a, b) == 'a' || maiorBigNumber(a, b) == 'c'){
         a = subtrai_BigNumber(a, b);

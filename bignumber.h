@@ -28,6 +28,7 @@ BigNumber* string_para_BigNumber(const char* string);
 void libera_BigNumber(BigNumber* number);
 void printBigNumber(BigNumber* number);
 void remove_zero(BigNumber* a);
+BigNumber* multiplica_BigNumber_inteiro(BigNumber* a, int b);
 
 char maiorBigNumber(BigNumber* a, BigNumber* b);
 char maiorInt(int a, int b);
